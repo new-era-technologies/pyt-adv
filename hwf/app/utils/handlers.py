@@ -45,7 +45,7 @@ async def return_to_home(message: Message, state: FSMContext) -> None:
 @router.message(F.text == 'Local point')
 async def fetch_weater_local(message: Message) -> None:
     await message.answer(f'Ok, no problem. Weather for {coordinates.city}, {coordinates.country}')
-    await get_data(0, message, kb.save_saved_home)
+    await get_data('local', message, kb.save_saved_home, None)
     global cashed
     cashed = coordinates.city
 
@@ -64,7 +64,7 @@ async def fetch_weather_by_city_get_state(message: Message, state: FSMContext):
     await state.update_data(name=message.text)
     data = await state.get_data()
     await message.answer(f"Ok, {html.bold(message.from_user.first_name)}, one moment. Weather for {data['name'].capitalize()}")
-    await get_data(1, message, kb.save_saved_home)
+    await get_data('city', message, kb.save_saved_home, None)
     global cashed
     cashed = data['name']
     await state.clear()
@@ -79,9 +79,6 @@ async def saved_city(message: Message) -> None:
     value = r.get('city')
     if value is not None:
         await message.answer(f"Ok, {html.bold(message.from_user.first_name)}, one moment. Weather for {value.decode('utf-8')}")
-        message.text == value.decode('utf-8')
-        print(message.text)
-        await get_data(1, message, kb.save_saved_home)
-        print(value)
+        await get_data('saved', message, kb.save_saved_home, value.decode('utf-8'))
     else:
         await message.answer(f"Sorry, {html.bold(message.from_user.first_name)}, nothing saved")
